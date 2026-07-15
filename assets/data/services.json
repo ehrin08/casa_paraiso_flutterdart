@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "services": [
+    {
+      "id": "gaia_touch",
+      "name": "Gaia Touch",
+      "price": 499.0,
+      "durationMinutes": 60,
+      "descriptionEn": "A calming full-body signature massage tailored to your preferred technique.",
+      "descriptionFil": "Isang nakapapawing full-body signature massage ayon sa napili mong paraan.",
+      "treatments": []
+    },
+    {
+      "id": "tethys_flow",
+      "name": "Tethys Flow",
+      "price": 649.0,
+      "durationMinutes": 60,
+      "descriptionEn": "A one-hour signature massage paired with one restorative treatment.",
+      "descriptionFil": "Isang oras na signature massage na may kasamang isang restorative treatment.",
+      "treatments": ["Ventosa", "Hot Compress"]
+    },
+    {
+      "id": "hestia_warmth",
+      "name": "Hestia Warmth",
+      "price": 749.0,
+      "durationMinutes": 90,
+      "descriptionEn": "An extended full-body ritual with your choice of warming treatment.",
+      "descriptionFil": "Mas mahabang full-body ritual na may napili mong warming treatment.",
+      "treatments": ["Ventosa", "Hot Stone", "Hot Compress"]
+    },
+    {
+      "id": "aurora_breeze",
+      "name": "Aurora Breeze",
+      "price": 849.0,
+      "durationMinutes": 120,
+      "descriptionEn": "A generous two-hour wellness escape with one included treatment.",
+      "descriptionFil": "Dalawang oras na wellness escape na may isang kasamang treatment.",
+      "treatments": ["Ventosa", "Hot Compress", "Hot Stone"]
+    }
+  ],
+  "extras": [
+    {"id": "back_massage", "name": "30-minute Back Massage", "price": 298.0, "durationMinutes": 30},
+    {"id": "vip_room", "name": "VIP Room", "price": 200.0, "durationMinutes": 0}
+  ],
+  "massageStyles": ["Swedish", "Shiatsu", "Traditional Hilot"]
+}
