@@ -14,7 +14,7 @@ This file applies to the entire repository. Treat it as the durable product and 
 ## Experience and brand
 
 - Use a light-only Material 3 experience that feels like a warm tropical wellness retreat translated into a dependable modern booking tool: calm, restorative, premium, natural, and caring.
-- Use `assets/images/casa_paraiso_logo.jpg` for splash/header contexts and crop its leaf emblem onto cream for launcher/web icons. Use `assets/images/service_board.jpg` as the Home hero image; do not add stock or generated spa photography without approval.
+- Use `assets/images/casa_paraiso_logo.jpg` for splash/header contexts and crop its leaf emblem onto cream for launcher/web icons. Use the approved generated spa still life at `assets/images/home_spa_banner.png` as the Home hero image. Retain `assets/images/service_board.jpg` as the original business photograph; do not add other stock or generated spa photography without approval.
 - Brand colors: cacao `#7A3518`, palm `#2F5D45`, muted brass `#A98245`, warm sand `#E4D4BD`, cream `#FBF7EF`, white surface `#FFFDF8`, ink `#2B211B`, muted text `#6F6259`, and error `#B3261E`.
 - Bundle and use Cormorant Garamond for display/emotional copy and Manrope for navigation, forms, prices, dates, and operational information. Do not require runtime font or icon downloads.
 - Prefer soft depth, arched image masks, restrained foliage, 4/8dp spacing, and purposeful 150–300ms motion. Honor reduced-motion preferences.

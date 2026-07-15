@@ -138,7 +138,7 @@ class _Hero extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/images/service_board.jpg',
+            'assets/images/home_spa_banner.png',
             fit: BoxFit.cover,
             alignment: Alignment.center,
           ),
