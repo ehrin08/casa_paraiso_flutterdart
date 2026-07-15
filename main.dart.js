@@ -48975,7 +48975,7 @@ A.aij.prototype={
 $2(a,b){return new A.tq(this.a.a[b],null)},
 $S:164}
 A.a2D.prototype={
-J(a){var s,r,q=null,p=t.l,o=A.bm(a,B.fy,p).w.a.a>=700?620:760,n=A.aTj("assets/images/service_board.jpg",B.af,B.Td,q),m=this.c,l=m.ga63()
+J(a){var s,r,q=null,p=t.l,o=A.bm(a,B.fy,p).w.a.a>=700?620:760,n=A.aTj("assets/images/home_spa_banner.png",B.af,B.Td,q),m=this.c,l=m.ga63()
 p=A.bm(a,B.fy,p).w.a.a<420?A.E(a).ok.d:A.E(a).ok.b
 p=A.a7(l,q,q,q,q,p==null?q:p.c4(B.n),q,q,q)
 l=m.ga64()
