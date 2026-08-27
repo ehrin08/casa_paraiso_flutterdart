@@ -1,3 +1,12 @@
+// Three-slide onboarding experience shown on first launch.
+//
+// Slides introduce: (1) service browsing, (2) local booking management,
+// (3) privacy/reminders. Skippable via the top-right button. The final
+// slide's "Get Started" button (or Skip) marks onboarding as complete
+// in [AppController], which persists the flag to SharedPreferences.
+//
+// Animated page indicator dots use brand colors (cacao active, sand inactive)
+// with a 200ms width transition for the active dot.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,6 +35,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // Each slide: (icon, title, body text) — all localized.
     final items = [
       (Icons.spa_outlined, l10n.onboardingOneTitle, l10n.onboardingOneBody),
       (
@@ -39,6 +49,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Top bar — logo + skip button.
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
               child: Row(
@@ -54,6 +65,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ],
               ),
             ),
+            // Swipeable slide pages.
             Expanded(
               child: PageView.builder(
                 controller: _controller,
@@ -66,6 +78,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Arched icon container matching brand aesthetics.
                         Container(
                           width: 136,
                           height: 168,
@@ -99,6 +112,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 },
               ),
             ),
+            // Bottom bar — page indicator dots + next/finish button.
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
               child: Row(

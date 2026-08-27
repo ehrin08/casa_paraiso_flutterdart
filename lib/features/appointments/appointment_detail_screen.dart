@@ -1,3 +1,10 @@
+// Appointment detail screen — full record view with reschedule/cancel actions.
+//
+// Shows all booking details (service, style, treatment, extras, date/time,
+// customer info, total, reference). Reschedule and Cancel buttons appear
+// only for confirmed appointments whose start time is still in the future.
+//
+// Navigation: /appointment/:id via GoRouter.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -32,9 +39,13 @@ class AppointmentDetailScreen extends ConsumerWidget {
     final start = tz.TZDateTime.from(appointment.startUtc, manila);
     final end = tz.TZDateTime.from(appointment.endUtc, manila);
     final locale = Localizations.localeOf(context).languageCode;
+
+    // Can only modify if confirmed and appointment hasn't started yet.
     final canChange =
         appointment.status == AppointmentStatus.confirmed &&
         appointment.startUtc.isAfter(DateTime.now().toUtc());
+
+    // Detail rows — dynamically built based on what data is present.
     final rows = <(String, String)>[
       (l10n.bookingReference, appointment.reference),
       (l10n.services, appointment.service.name),
@@ -60,6 +71,7 @@ class AppointmentDetailScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header with leaf badge and service name.
               Row(
                 children: [
                   const LeafMark(size: 52),
@@ -73,6 +85,7 @@ class AppointmentDetailScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 24),
+              // Detail card with label–value rows.
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -112,6 +125,7 @@ class AppointmentDetailScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+              // Reschedule and Cancel buttons (only for modifiable appointments).
               if (canChange) ...[
                 const SizedBox(height: 24),
                 Wrap(
@@ -140,6 +154,8 @@ class AppointmentDetailScreen extends ConsumerWidget {
     );
   }
 
+  /// Shows a confirmation dialog before cancelling; updates state and
+  /// removes scheduled reminders on confirmation.
   Future<void> _confirmCancel(
     BuildContext context,
     WidgetRef ref,
@@ -170,6 +186,9 @@ class AppointmentDetailScreen extends ConsumerWidget {
     }
   }
 
+  /// Opens a dialog to pick a new date/time. Uses [AvailabilityService.slots]
+  /// with [excludingAppointmentId] so the appointment being moved doesn't
+  /// block its own time window during overlap checks.
   Future<void> _showReschedule(
     BuildContext context,
     WidgetRef ref,

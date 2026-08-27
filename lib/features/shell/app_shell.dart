@@ -1,3 +1,12 @@
+// Responsive app shell — the main navigation scaffold after onboarding.
+//
+// Uses [LayoutBuilder] to switch between:
+// - Bottom [NavigationBar] on phones (< 600dp width).
+// - [NavigationRail] on tablets/desktops (≥ 600dp), extended labels at ≥ 900dp.
+//
+// The four primary destinations (Home, Services, Bookings, Profile) are
+// maintained in an [IndexedStack] so each screen preserves its scroll
+// position when the user switches tabs.
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -20,6 +29,7 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // Destination tuples: (outlined icon, filled icon, localized label).
     final destinations = [
       (Icons.home_outlined, Icons.home, l10n.home),
       (Icons.spa_outlined, Icons.spa, l10n.services),
@@ -36,6 +46,8 @@ class _AppShellState extends State<AppShell> {
       builder: (context, constraints) {
         final wide = constraints.maxWidth >= 600;
         final content = IndexedStack(index: _index, children: pages);
+
+        // Tablet / desktop layout — side navigation rail.
         if (wide) {
           return Scaffold(
             body: Row(
@@ -67,6 +79,8 @@ class _AppShellState extends State<AppShell> {
             ),
           );
         }
+
+        // Phone layout — bottom navigation bar.
         return Scaffold(
           body: content,
           bottomNavigationBar: NavigationBar(

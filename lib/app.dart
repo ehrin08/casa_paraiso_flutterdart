@@ -1,3 +1,8 @@
+// Root application widget and first-launch onboarding gate.
+//
+// [CasaParaisoApp] configures Material 3 theming, bilingual localization,
+// and hash-based GoRouter navigation. [OnboardingGate] decides whether the
+// user sees the three-slide onboarding or the main [AppShell].
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +17,8 @@ import 'features/shell/app_shell.dart';
 import 'l10n/app_localizations.dart';
 import 'providers.dart';
 
+/// GoRouter configuration — hash-based URLs for GitHub Pages compatibility.
+/// Routes: / (shell or onboarding), /service/:id, /book/:id, /appointment/:id.
 final _router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (_, _) => const OnboardingGate()),
@@ -33,6 +40,8 @@ final _router = GoRouter(
   ],
 );
 
+/// Top-level Material 3 app — watches the locale from [AppController] so
+/// the entire widget tree rebuilds when the user switches language.
 class CasaParaisoApp extends ConsumerWidget {
   const CasaParaisoApp({super.key});
 
@@ -58,6 +67,8 @@ class CasaParaisoApp extends ConsumerWidget {
   }
 }
 
+/// Gate widget — shows onboarding slides on first launch; once completed
+/// (or skipped), displays the main [AppShell] with bottom/rail navigation.
 class OnboardingGate extends ConsumerWidget {
   const OnboardingGate({super.key});
 

@@ -1,3 +1,11 @@
+// Bookings list screen — tabbed view of upcoming, completed, and cancelled.
+//
+// Appointment status is derived at display time:
+// - **Upcoming**: confirmed + end time still in the future.
+// - **Completed**: confirmed + end time has passed.
+// - **Cancelled**: explicitly cancelled status (permanent record).
+//
+// Each tab shows a count badge. Tapping a card navigates to the detail screen.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +28,8 @@ class BookingsScreen extends ConsumerWidget {
       appControllerProvider.select((value) => value.appointments),
     );
     final now = DateTime.now().toUtc();
+
+    // Partition appointments into three groups by derived status.
     final upcoming =
         appointments
             .where(
@@ -43,6 +53,7 @@ class BookingsScreen extends ConsumerWidget {
             .where((item) => item.status == AppointmentStatus.cancelled)
             .toList()
           ..sort((a, b) => b.startUtc.compareTo(a.startUtc));
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -55,6 +66,7 @@ class BookingsScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.displayMedium,
               ),
               const SizedBox(height: 18),
+              // Tab bar with count badges.
               TabBar(
                 isScrollable: MediaQuery.sizeOf(context).width < 500,
                 tabs: [
@@ -81,6 +93,8 @@ class BookingsScreen extends ConsumerWidget {
   }
 }
 
+/// Scrollable list of appointment cards — shared by all three tabs.
+/// Shows an empty state with a calendar icon when no appointments exist.
 class _AppointmentList extends StatelessWidget {
   const _AppointmentList({required this.items});
   final List<Appointment> items;

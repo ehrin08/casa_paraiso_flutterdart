@@ -1,13 +1,25 @@
+// Contact action utilities — phone, Messenger, Maps, and Facebook links.
+//
+// All URLs are the official Casa Paraiso business links. Phone numbers
+// are the three authorized lines (DITO, TM, Landline). The bottom sheet
+// chooser lets the user pick which number to dial.
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/app_localizations.dart';
 
+/// Official Facebook page URL.
 const facebookUrl = 'https://www.facebook.com/61579320037378';
+
+/// Messenger deep link for direct chat.
 const messengerUrl = 'https://m.me/61579320037378';
+
+/// Google Maps search for the spa's physical address in Cuta East, Batangas.
 const mapsUrl =
     'https://www.google.com/maps/search/?api=1&query=Casa+Paraiso+Body+%26+Wellness+Spa%2C+Cuta+East%2C+Santa+Teresita%2C+Batangas';
 
+/// Opens an external URL (browser, phone dialer, etc.).
+/// Shows a snackbar if the URL cannot be launched.
 Future<void> launchExternal(BuildContext context, String raw) async {
   final uri = Uri.parse(raw);
   if (!await launchUrl(uri, mode: LaunchMode.externalApplication) &&
@@ -18,6 +30,8 @@ Future<void> launchExternal(BuildContext context, String raw) async {
   }
 }
 
+/// Shows a bottom sheet with the three official phone numbers.
+/// Tapping a number opens the device dialer.
 Future<void> showPhoneChooser(BuildContext context) async {
   final numbers = [
     ('DITO', '0991 652 2754', 'tel:09916522754'),
@@ -55,6 +69,8 @@ Future<void> showPhoneChooser(BuildContext context) async {
   );
 }
 
+/// A row of outlined action buttons: Call, Message, Directions.
+/// Used on both the Home screen and Profile screen.
 class ContactActionRow extends StatelessWidget {
   const ContactActionRow({super.key});
 

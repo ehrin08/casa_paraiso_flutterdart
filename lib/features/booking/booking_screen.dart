@@ -1,3 +1,11 @@
+// Multi-step booking flow — the core transactional screen.
+//
+// A 4-step wizard: (0) Options → (1) Date/Time → (2) Details → (3) Review.
+// On confirmation, an immutable [Appointment] snapshot is created and
+// persisted locally. The booking flow ends with a confirmation screen
+// showing the reference code and a prompt for notification permission.
+//
+// Navigation: /book/:id via GoRouter.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,23 +28,25 @@ class BookingScreen extends ConsumerStatefulWidget {
 }
 
 class _BookingScreenState extends ConsumerState<BookingScreen> {
+  // Form controllers and selection state for the wizard steps.
   final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _mobile = TextEditingController();
   final _email = TextEditingController();
   final _notes = TextEditingController();
-  String? _style;
-  String? _treatment;
-  final Set<String> _extraIds = {};
-  DateTime? _businessDate;
-  tz.TZDateTime? _start;
-  bool _consent = false;
-  var _step = 0;
-  Appointment? _confirmed;
+  String? _style;          // Selected massage style.
+  String? _treatment;      // Selected included treatment.
+  final Set<String> _extraIds = {};  // IDs of selected paid extras.
+  DateTime? _businessDate; // Calendar date chosen by user.
+  tz.TZDateTime? _start;   // Specific time slot chosen.
+  bool _consent = false;   // Local-data consent checkbox.
+  var _step = 0;           // Current wizard step (0–3).
+  Appointment? _confirmed; // Non-null after successful booking.
 
   @override
   void initState() {
     super.initState();
+    // Pre-fill customer details from saved profile (if exists).
     final state = ref.read(appControllerProvider);
     final profile = state.profile;
     if (profile != null) {
@@ -59,6 +69,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // After confirmation, show the success screen instead of the wizard.
     if (_confirmed != null) return _Confirmation(appointment: _confirmed!);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.bookNow)),
@@ -83,6 +94,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Package name and live-updating duration/price pills.
                       Text(
                         service.name,
                         style: Theme.of(context).textTheme.displayMedium,
@@ -103,8 +115,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         ],
                       ),
                       const SizedBox(height: 24),
+                      // Visual progress bar for the 4-step wizard.
                       _Progress(current: _step),
                       const SizedBox(height: 24),
+                      // Animated step content — switches between the 4 steps.
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 220),
                         child: switch (_step) {
@@ -122,7 +136,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                               selected
                                   ? _extraIds.add(id)
                                   : _extraIds.remove(id);
-                              _start = null;
+                              _start = null; // Reset slot when extras change duration.
                             }),
                           ),
                           1 => _DateTimeStep(
@@ -132,7 +146,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             selectedStart: _start,
                             onDate: (value) => setState(() {
                               _businessDate = value;
-                              _start = null;
+                              _start = null; // Reset slot when date changes.
                             }),
                             onStart: (value) => setState(() => _start = value),
                           ),
@@ -164,6 +178,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         },
                       ),
                       const SizedBox(height: 28),
+                      // Navigation buttons — Back (steps 1+) and Next/Confirm.
                       Row(
                         children: [
                           if (_step > 0)
@@ -201,6 +216,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     );
   }
 
+  /// Validates the current step and advances — or creates the appointment.
   Future<void> _advance(
     Catalog catalog,
     ServicePackage service,
@@ -210,23 +226,27 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   ) async {
     final l10n = AppLocalizations.of(context);
     if (_step == 0) {
+      // Step 0: require massage style and treatment (if package has treatments).
       if (_style == null ||
           (service.treatments.isNotEmpty && _treatment == null)) {
         _showError(l10n.selectOption);
         return;
       }
     } else if (_step == 1) {
+      // Step 1: require a time slot selection.
       if (_start == null) {
         _showError(l10n.selectDateTime);
         return;
       }
     } else if (_step == 2) {
+      // Step 2: validate form fields and consent checkbox.
       if (!(_formKey.currentState?.validate() ?? false)) return;
       if (!_consent) {
         _showError(l10n.consentTitle);
         return;
       }
     } else {
+      // Step 3 (Review): create and persist the appointment.
       final controller = ref.read(appControllerProvider.notifier);
       final normalized = validatePhilippineMobile(_mobile.text)!;
       final customer = CustomerProfile(
@@ -271,6 +291,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     setState(() => _step++);
   }
 
+  /// After first booking confirmation, offers to enable Android notifications.
   Future<void> _offerNotifications() async {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
@@ -303,6 +324,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   ).showSnackBar(SnackBar(content: Text(message)));
 }
 
+// ---------------------------------------------------------------------------
+// Step sub-widgets
+// ---------------------------------------------------------------------------
+
+/// Visual progress indicator — four colored bars showing the current step.
 class _Progress extends StatelessWidget {
   const _Progress({required this.current});
   final int current;
@@ -324,6 +350,7 @@ class _Progress extends StatelessWidget {
   );
 }
 
+/// Step 0: Massage style, treatment, and extras selection.
 class _OptionsStep extends StatelessWidget {
   const _OptionsStep({
     super.key,
@@ -404,6 +431,10 @@ class _OptionsStep extends StatelessWidget {
   }
 }
 
+/// Step 1: Date picker and time-slot selection.
+///
+/// Generates available slots using [AvailabilityService], respecting
+/// lead time, horizon, business hours, and overlap constraints.
 class _DateTimeStep extends ConsumerWidget {
   const _DateTimeStep({
     super.key,
@@ -425,6 +456,7 @@ class _DateTimeStep extends ConsumerWidget {
     final appointments = ref.watch(
       appControllerProvider.select((value) => value.appointments),
     );
+    // Generate available time slots for the selected date.
     final slots = businessDate == null
         ? <tz.TZDateTime>[]
         : ref
@@ -459,6 +491,7 @@ class _DateTimeStep extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
+        // Disclaimer: slots are local-only, not confirmed with the spa.
         Text(
           l10n.localOnlyAvailability,
           style: Theme.of(context).textTheme.bodySmall,
@@ -489,6 +522,10 @@ class _DateTimeStep extends ConsumerWidget {
   }
 }
 
+/// Step 2: Customer details form (name, mobile, email, notes, consent).
+///
+/// Validates Philippine mobile format and optional email.
+/// Pre-fills from saved profile when available.
 class _DetailsStep extends StatelessWidget {
   const _DetailsStep({
     super.key,
@@ -567,6 +604,7 @@ class _DetailsStep extends StatelessWidget {
               alignLabelWithHint: true,
             ),
           ),
+          // First-booking consent for local data storage.
           CheckboxListTile(
             value: consent,
             onChanged: onConsent,
@@ -581,6 +619,7 @@ class _DetailsStep extends StatelessWidget {
   }
 }
 
+/// Step 3: Full booking review — all selections, total, and "pay at spa" note.
 class _ReviewStep extends StatelessWidget {
   const _ReviewStep({
     super.key,
@@ -683,6 +722,8 @@ class _ReviewStep extends StatelessWidget {
   }
 }
 
+/// Post-booking confirmation screen — reference code, appointment summary,
+/// and a "Done" button that returns to the home screen.
 class _Confirmation extends StatelessWidget {
   const _Confirmation({required this.appointment});
   final Appointment appointment;
@@ -699,6 +740,7 @@ class _Confirmation extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Success checkmark badge.
             Container(
               width: 104,
               height: 104,
@@ -728,6 +770,7 @@ class _Confirmation extends StatelessWidget {
               l10n.bookingReference,
               style: const TextStyle(color: AppColors.muted),
             ),
+            // Selectable text so the user can copy the reference code.
             SelectableText(
               appointment.reference,
               style: Theme.of(context).textTheme.headlineSmall,

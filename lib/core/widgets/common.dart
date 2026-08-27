@@ -1,8 +1,17 @@
+// Shared reusable widgets used across multiple feature screens.
+//
+// Kept small and focused — each widget handles one visual concern.
+// Screens compose these to maintain consistent spacing, branding, and
+// responsive behavior without duplicating layout code.
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../theme/app_theme.dart';
 
+/// Wraps page content in a centered, width-constrained, padded container.
+///
+/// Ensures content looks good on both phones (full width) and tablets/desktops
+/// (max 1120dp by default). All scrollable screens use this as their root.
 class ResponsivePage extends StatelessWidget {
   const ResponsivePage({
     super.key,
@@ -28,6 +37,7 @@ class ResponsivePage extends StatelessWidget {
   );
 }
 
+/// A bold section title row with an optional trailing action widget.
 class SectionHeader extends StatelessWidget {
   const SectionHeader({super.key, required this.title, this.trailing});
   final String title;
@@ -44,6 +54,8 @@ class SectionHeader extends StatelessWidget {
   );
 }
 
+/// The Casa Paraiso logo loaded from bundled assets with a semantic label
+/// for screen readers.
 class AppLogo extends StatelessWidget {
   const AppLogo({super.key, this.height = 72});
   final double height;
@@ -60,6 +72,8 @@ class AppLogo extends StatelessWidget {
   );
 }
 
+/// A small circular badge with a spa leaf icon — used as a visual mark
+/// on service cards and appointment list items.
 class LeafMark extends StatelessWidget {
   const LeafMark({super.key, this.size = 40});
   final double size;
@@ -76,12 +90,15 @@ class LeafMark extends StatelessWidget {
   );
 }
 
+/// Formats a [double] as a Philippine peso string (e.g., "₱749.00").
 String peso(double amount) => NumberFormat.currency(
   locale: 'en_PH',
   symbol: '₱',
   decimalDigits: 2,
 ).format(amount);
 
+/// A rounded pill-shaped chip displaying an icon and label — used for
+/// duration and price metadata on service/booking cards.
 class InfoPill extends StatelessWidget {
   const InfoPill({super.key, required this.icon, required this.label});
   final IconData icon;

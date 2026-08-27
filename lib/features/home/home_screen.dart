@@ -1,3 +1,9 @@
+// Home screen — the landing page after onboarding.
+//
+// Displays: logo, data-recovery notice (if any), web reminder card for
+// appointments within 24 hours, a hero banner with business hours and
+// a "Book Now" call-to-action, a responsive grid of featured service cards,
+// and contact shortcuts (call, message, directions).
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +27,8 @@ class HomeScreen extends ConsumerWidget {
     final state = ref.watch(appControllerProvider);
     final manila = tz.getLocation('Asia/Manila');
     final now = DateTime.now().toUtc();
+
+    // Filter and sort upcoming confirmed appointments for the reminder card.
     final upcoming =
         state.appointments
             .where(
@@ -30,9 +38,12 @@ class HomeScreen extends ConsumerWidget {
             )
             .toList()
           ..sort((a, b) => a.startUtc.compareTo(b.startUtc));
+
+    // Show a web-based reminder if the next appointment is within 24 hours.
     final reminder =
         upcoming.isNotEmpty &&
         upcoming.first.startUtc.difference(now) <= const Duration(hours: 24);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: ResponsivePage(
@@ -41,6 +52,7 @@ class HomeScreen extends ConsumerWidget {
             children: [
               const AppLogo(height: 64),
               const SizedBox(height: 20),
+              // Data recovery notice — shown when a corrupt payload was cleared.
               if (state.recoveredData)
                 Card(
                   color: const Color(0xFFFFF1E8),
@@ -49,6 +61,7 @@ class HomeScreen extends ConsumerWidget {
                     title: Text(l10n.dataRecovered),
                   ),
                 ),
+              // Web reminder card — in-app alternative to push notifications.
               if (reminder)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -68,11 +81,13 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
+              // Hero banner with spa image, business hours, and Book Now CTA.
               _Hero(
                 l10n: l10n,
                 onBook: () => context.push('/service/gaia_touch'),
               ),
               const SizedBox(height: 32),
+              // Featured service packages grid — responsive columns.
               SectionHeader(title: l10n.featuredServices),
               const SizedBox(height: 16),
               catalog.when(
@@ -98,6 +113,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 32),
+              // Contact section — address, landmark, and action buttons.
               SectionHeader(title: l10n.contactUs),
               const SizedBox(height: 12),
               Text(
@@ -115,12 +131,15 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  /// Formats a UTC DateTime for display in Manila timezone.
   String _formatDate(DateTime utc, tz.Location location, String locale) {
     final local = tz.TZDateTime.from(utc, location);
     return DateFormat.yMMMd(locale).add_jm().format(local);
   }
 }
 
+/// Full-width hero banner with the spa still-life image, gradient overlay,
+/// headline, subtitle, business hours pill, and primary booking button.
 class _Hero extends StatelessWidget {
   const _Hero({required this.l10n, required this.onBook});
   final AppLocalizations l10n;
@@ -137,11 +156,13 @@ class _Hero extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
+          // Background spa banner image.
           Image.asset(
             'assets/images/home_spa_banner.png',
             fit: BoxFit.cover,
             alignment: Alignment.center,
           ),
+          // Dark gradient overlay for text readability.
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -151,6 +172,7 @@ class _Hero extends StatelessWidget {
               ),
             ),
           ),
+          // Text content anchored at the bottom of the hero.
           Padding(
             padding: const EdgeInsets.all(28),
             child: Column(
@@ -173,6 +195,7 @@ class _Hero extends StatelessWidget {
                   ).textTheme.bodyLarge?.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 16),
+                // Business hours pill.
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -215,6 +238,8 @@ class _Hero extends StatelessWidget {
   );
 }
 
+/// A branded card for a single service package — shows leaf icon, price,
+/// name, description, and duration pill. Taps navigate to the detail screen.
 class ServiceCard extends StatelessWidget {
   const ServiceCard({super.key, required this.service});
   final ServicePackage service;

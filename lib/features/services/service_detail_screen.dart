@@ -1,3 +1,10 @@
+// Service detail screen — shows full package info and a "Book Now" button.
+//
+// Displays: arched icon header, package name, localized description,
+// duration/price pills, massage styles, included treatments (if any),
+// available paid extras with prices, and the primary booking CTA.
+//
+// Navigated to via GoRouter: /service/:id.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +39,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Decorative arched container with spa icon.
                       Container(
                         height: 180,
                         width: double.infinity,
@@ -61,6 +69,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const SizedBox(height: 20),
+                      // Duration and price metadata pills.
                       Wrap(
                         spacing: 10,
                         runSpacing: 10,
@@ -76,12 +85,14 @@ class ServiceDetailScreen extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 28),
+                      // Massage style options (Swedish, Shiatsu, Traditional Hilot).
                       Text(
                         l10n.massageStyle,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(catalog.massageStyles.join(' · ')),
+                      // Included treatments (only for packages that have them).
                       if (service.treatments.isNotEmpty) ...[
                         const SizedBox(height: 24),
                         Text(
@@ -92,6 +103,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                         Text(service.treatments.join(' · ')),
                       ],
                       const SizedBox(height: 24),
+                      // Available paid extras with prices.
                       Text(
                         l10n.extras,
                         style: Theme.of(context).textTheme.titleLarge,
@@ -118,6 +130,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                           ),
                         ),
                       const SizedBox(height: 32),
+                      // Navigate to the booking flow for this package.
                       FilledButton.icon(
                         onPressed: () => context.push('/book/$serviceId'),
                         icon: const Icon(Icons.calendar_month),

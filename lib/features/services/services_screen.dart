@@ -1,3 +1,9 @@
+// Services catalog screen — displays all spa packages in a responsive grid.
+//
+// Uses the async [catalogProvider] to load the bundled JSON catalog.
+// The grid switches from 1 column on phones to 2 columns at ≥ 800dp.
+// Each item renders as a [ServiceCard] (defined in home_screen.dart)
+// that navigates to the service detail screen on tap.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

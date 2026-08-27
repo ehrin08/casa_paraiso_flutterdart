@@ -1,3 +1,12 @@
+// Profile screen — customer info, language, notifications, contact,
+// privacy, and app information.
+//
+// Sections: profile card (with edit), language switcher (en/fil),
+// notifications info, contact shortcuts (call/message/directions/Facebook),
+// privacy (replay onboarding, reset data), and About.
+//
+// Edit Profile opens a dialog with validated form fields.
+// Reset Data requires confirmation and erases all local data.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,6 +37,7 @@ class ProfileScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.displayMedium,
               ),
               const SizedBox(height: 24),
+              // Profile card — shows saved name/mobile/email or a placeholder.
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -67,6 +77,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              // Language switcher — persists locale preference.
               _Section(
                 title: l10n.language,
                 child: SegmentedButton<String>(
@@ -81,6 +92,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // Notification info — explains reminder behavior.
               _Section(
                 title: l10n.notifications,
                 child: Row(
@@ -96,6 +108,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // Contact section — address, landmark, action buttons, Facebook.
               _Section(
                 title: l10n.contactUs,
                 child: Column(
@@ -119,6 +132,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // Privacy section — replay onboarding and destructive reset.
               _Section(
                 title: l10n.privacy,
                 child: Column(
@@ -145,6 +159,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // About section — app identity and version.
               _Section(
                 title: l10n.about,
                 child: const Text(
@@ -158,6 +173,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
+  /// Opens a dialog to edit customer profile with validated fields.
   Future<void> _editProfile(
     BuildContext context,
     WidgetRef ref,
@@ -243,6 +259,8 @@ class ProfileScreen extends ConsumerWidget {
     email.dispose();
   }
 
+  /// Confirms and executes a full data reset — erases profile, appointments,
+  /// settings, consent, onboarding state, and scheduled reminders.
   Future<void> _reset(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
@@ -268,6 +286,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
+/// Reusable card section widget used throughout the profile screen.
 class _Section extends StatelessWidget {
   const _Section({required this.title, required this.child});
   final String title;
